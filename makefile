@@ -1,17 +1,20 @@
 CC = emcc
-CFLAGS = -O3
+CFLAGS = -O3 -std=c++14
 SRC = src
 DIST = bin
 TMP = intermediate
-TARGET = $(DIST)/wasmgl.html
+TARGET = $(DIST)/wasmgl.js
+SOURCES = $(wildcard $(SRC)/*.cpp $(SRC)/*.c)
+OBJECTS = $(patsubst $(SRC)/%.cpp, $(TMP)/%.o, $(SOURCES))
 
-$(TARGET) : $(TMP)/main.o
-	$(CC) $(CFLAGS) $(TMP)/main.o -s WASM=1 -o $(TARGET) 
+$(TARGET) : $(OBJECTS)
+	$(CC) $(CFLAGS) $(OBJECTS) -s WASM=1 -o $(TARGET)
 
-$(TMP)/main.o : $(SRC)/main.cpp
-	$(CC) $(CFLAGS) $(SRC)/main.cpp -o $(TMP)/main.o
-
+$(OBJECTS) : $(TMP)/%.o : $(SRC)/%.cpp
+	$(CC) $(CFLAGS) -c $< -o $@
 
 $(TMP) : 
 	mkdir -p $@
 
+clean :
+	rm -rf $(OBJECTS)
