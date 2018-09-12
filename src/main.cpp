@@ -1,7 +1,7 @@
+#include "main.h"
 #include <emscripten.h>
 #include <functional>
 #include <SDL.h>
-
 #include <SDL_opengles2.h>
 
 // Shader sources
@@ -40,12 +40,20 @@ int main() {
     glGenBuffers(1, &vbo);
 
     GLfloat vertices[] = {
-        0.0f, 0.5f, 1.0f, 0.0f, 0.0f, 
+        -0.5f, 0.5f, 1.0f, 1.0f, 1.0f, 
+        0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 
         0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
         -0.5f, -0.5f, 0.0f, 0.0f, 1.0f };
 
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    // index buffer
+    GLuint ibo;
+    glGenBuffers(1, &ibo);
+    GLshort indices[] = {0, 1, 2, 0, 2, 3};
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
     // Create and compile the vertex shader
     GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
@@ -67,26 +75,19 @@ int main() {
     // Specify the layout of the vertex data
     GLint posAttrib = glGetAttribLocation(shaderProgram, "position");
     glEnableVertexAttribArray(posAttrib);
-    glVertexAttribPointer(posAttrib, 2, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
+    glVertexAttribPointer(posAttrib, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), 0);
 
     GLint colorAttrib = glGetAttribLocation(shaderProgram, "color");
     glEnableVertexAttribArray(colorAttrib);
-    glVertexAttribPointer(colorAttrib, 3, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (const GLvoid *)(2 * sizeof(float)));
+    glVertexAttribPointer(colorAttrib, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (const GLvoid *)(2 * sizeof(GLfloat)));
 
     loop = [&]
     {
-        // move a vertex
-        const uint32_t milliseconds_since_start = SDL_GetTicks();
-        const uint32_t milliseconds_per_loop = 3000;
-        vertices[0] = ( milliseconds_since_start % milliseconds_per_loop ) / float(milliseconds_per_loop) - 0.5f;
-        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
         // Clear the screen
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        // Draw a triangle from the 3 vertices
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, (void*)0);
 
         SDL_GL_SwapWindow(window);
     };
