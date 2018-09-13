@@ -1,5 +1,5 @@
 CC = emcc
-CFLAGS = -O3 -std=c++14 -s USE_SDL=2 -s USE_WEBGL2=1 -I./src/thirdparty -I./src
+CFLAGS = -O3 -std=c++14 -stdlib=libc++ -s USE_SDL=2 -s USE_WEBGL2=1 -I./src/Thirdparty -I./src/VoxerEngine -I./src
 LDFLAGS = -s WASM=1
 SRC = src
 DIST = bin
@@ -8,11 +8,11 @@ TARGET = $(DIST)/wasmgl.js
 
 SOURCES = $(shell find ./src -name "*.cpp")
 OBJECTS = $(patsubst ./src/%.cpp, ./intermediate/%.o, $(SOURCES))
-TMPDIRS = $(foreach f, $(OBJECTS), $(dir $(f)))
+TMPDIRS = $(sort $(foreach f, $(OBJECTS), $(dir $(f))))
 
 DEP = $(OBJECTS:.o=.d)  # one dependency file for each source
 
-$(TARGET) : $(OBJECTS) stdafx.h.gch $(CreateTmpDirs)
+$(TARGET) : $(TMPDIRS) stdafx.h.gch $(OBJECTS) 
 	$(CC) $(CFLAGS) $(LDFLAGS) $(OBJECTS) -o $(TARGET)
 
 stdafx.h.gch : src/stdafx.h
@@ -37,7 +37,6 @@ print :
 
 .PHONY: clean
 clean :
-	echo $(SOURCES)
 	rm -rf $(OBJECTS)
 	rm -rf $(DEP)
 	rm -rf stdafx.h.gch
