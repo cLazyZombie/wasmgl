@@ -43,5 +43,8 @@ namespace VoxerEngine
 	private:
 		void DoRender();
 		void Render(IVoxelMesh* voxel);
+
+		static void PrintShaderCompileStatus(GLuint shader);
+		static void PrintProgramLinkStatus(GLuint program);
 	};
 }

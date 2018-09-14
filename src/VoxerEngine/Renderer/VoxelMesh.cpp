@@ -116,10 +116,24 @@ namespace VoxerEngine
 
 	void VoxelMesh::BindBuffer()
 	{
+		// bind vbo
         glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
         assert(glGetError() == 0);
 
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ibo);
+		// pos
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(VoxelMesh), 0);
+
+		// normal
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(VoxelMesh), (const GLvoid *)(3 * sizeof(GLfloat)));
+
+		// uv
+        glEnableVertexAttribArray(2);
+        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(VoxelMesh), (const GLvoid *)(6 * sizeof(GLfloat)));
+
+		// bind ibo
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ibo);
         assert(glGetError() == 0);
 	}
 

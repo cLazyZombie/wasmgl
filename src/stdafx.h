@@ -20,7 +20,7 @@
 #include <emscripten.h>
 
 #include <SDL.h>
-#include <SDL_opengles2.h>
+#include <GLES3/gl3.h>
 
 #include <glm/glm.hpp>
 
