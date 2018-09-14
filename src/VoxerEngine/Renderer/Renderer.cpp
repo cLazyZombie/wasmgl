@@ -81,117 +81,37 @@ namespace VoxerEngine
 	Renderer::~Renderer()
 	{
     }
-	void Renderer::Start()
-	{
-		m_renderThread = thread(&Renderer::DoRender, this);
-	}
 
 	void Renderer::Add(shared_ptr<IVoxelMesh> voxelMesh)
 	{
-		m_voxelMeshesForAdd.push_back(voxelMesh);
+		m_voxelMeshes.push_back(voxelMesh);
 	}
 
-	void Renderer::PrepareRender(const CameraView& cameraView)
+	void Renderer::Draw(const CameraView& cameraView)
 	{
-		unique_lock<mutex> locker(m_mutex);
-		
-		if (m_started == false)
-		{
-			m_gameCV.wait(locker);
-		}
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-		m_started = false;
+		glUseProgram(m_shaderProgram);
 
-		m_cameraView = cameraView;
-		m_voxelMeshesForRender = std::move(m_voxelMeshesForAdd);
-		assert(m_voxelMeshesForAdd.size() == 0);
+		auto projectionMatrix = Matrix::ProjectionMatrix(cameraView.Fov.value, (float)m_info.Width / m_info.Height, cameraView.Near, cameraView.Far);
+		auto viewProjectionMatrix = cameraView.ViewMatrix * projectionMatrix;
 
-		m_renderCV.notify_all();
-	}
+		GLint vpMatrixPos = glGetUniformLocation(m_shaderProgram, "VPMatrix");
+		glUniformMatrix4fv(vpMatrixPos, 1, GL_FALSE, (GLfloat *)&viewProjectionMatrix);
 
-	void Renderer::DoRender()
-	{
-		unique_lock<mutex> locker(m_mutex);
-
-		while (true)
-		{
-			m_renderCV.wait(locker);
-			if (m_terminated) break;
-
-			m_started = true;
-
-        	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-
-			auto projectionMatrix = Matrix::ProjectionMatrix(m_cameraView.Fov.value, (float)m_info.Width / m_info.Height, m_cameraView.Near, m_cameraView.Far);
-			auto viewProjectionMatrix = m_cameraView.ViewMatrix * projectionMatrix;
-
-			GLint vpMatrixPos = glGetUniformLocation(m_shaderProgram, "VPMatrix");
-			glUniformMatrix4fv(vpMatrixPos, 1, GL_FALSE, (GLfloat *)&viewProjectionMatrix);
-
-			// if (m_texture)
-			// {
-			// 	hr = m_voxelEffect->SetTexture("DiffuseTexture", m_texture);
-			// 	assert(SUCCEEDED(hr));
-			// }
-
-			for (shared_ptr<IVoxelMesh>& voxelMesh : m_voxelMeshesForRender)
-			{
-			 	Render(voxelMesh.get());
-			}
-
-			// hr = m_device->EndScene();
-			// assert(SUCCEEDED(hr));
-
-			// hr = m_device->Present(nullptr, nullptr, nullptr, nullptr);
-			// assert(SUCCEEDED(hr));
-
-			m_voxelMeshesForRender.clear();
-
-			m_gameCV.notify_all();
-		}
-	}
-
-	void Renderer::Terminate()
-	{
-		{
-			unique_lock<mutex> locker(m_mutex);
-			m_terminated = true;
-			m_renderCV.notify_all();
-		}
-
-		if (m_renderThread.joinable())
-		{
-			m_renderThread.join();
-		}
-	}
-
-	void Renderer::Render(IVoxelMesh* voxel)
-	{
-		voxel->BindBuffer();
-
-		// // set vertex
-		// hr = m_voxelEffect->Begin(&maxPass, 0);
-
-		// assert(SUCCEEDED(hr));
-		// for (UINT pass = 0; pass < maxPass; ++pass)
+		// if (m_texture)
 		// {
-		// 	hr = m_voxelEffect->BeginPass(pass);
+		// 	hr = m_voxelEffect->SetTexture("DiffuseTexture", m_texture);
 		// 	assert(SUCCEEDED(hr));
-
-		// 	Vector3 offset = Vector3::ZeroVector;
-		// 	hr = m_voxelEffect->SetValue("Offset", &offset, sizeof(offset));
-		// 	assert(SUCCEEDED(hr));
-
-		// 	hr = m_voxelEffect->CommitChanges();
-		// 	assert(SUCCEEDED(hr));
-
-		// 	voxel->Render();
-
-		// 	m_voxelEffect->EndPass();
 		// }
 
-		// hr = m_voxelEffect->End();
-		// assert(SUCCEEDED(hr));
+		for (shared_ptr<IVoxelMesh>& voxelMesh : m_voxelMeshes)
+		{
+			voxelMesh->BindBuffer();
+			voxelMesh->Render();
+		}
+
+		m_voxelMeshes.clear();
 	}
 
 	IVoxelMesh* Renderer::CreateVoxelMesh()

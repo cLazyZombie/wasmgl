@@ -25,10 +25,6 @@ std::function<void()> loop;
 void main_loop() { loop(); }
 
 int main() {
-    #ifdef DEBUG
-	printf("------------------------------------------\n");
-    #endif
-
      if (SDL_Init(SDL_INIT_VIDEO) < 0) {
         SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't initialize SDL: %s", SDL_GetError());
         return 3;
@@ -110,6 +106,7 @@ int main() {
 
     loop = [&]
     {
+        //r->Draw()
         // // Clear the screen
         // glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         // glClear(GL_COLOR_BUFFER_BIT);

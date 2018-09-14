@@ -19,31 +19,17 @@ namespace VoxerEngine
 		GLuint m_vertexShader = 0;
 		GLuint m_fragmentShader = 0;
 		
-		vector<shared_ptr<IVoxelMesh>> m_voxelMeshesForAdd;
-		vector<shared_ptr<IVoxelMesh>> m_voxelMeshesForRender;
-
-		mutex m_mutex;
-		condition_variable m_gameCV;
-		condition_variable m_renderCV;
-		bool m_started = true;
-		bool m_terminated = false;
-		CameraView m_cameraView;
-		thread m_renderThread;
+		vector<shared_ptr<IVoxelMesh>> m_voxelMeshes;
 
 	public:
 		Renderer(const Info& info);
 		virtual ~Renderer();
 
-		virtual void Start() override;
 		virtual void Add(shared_ptr<IVoxelMesh> voxelMesh) override;
-		virtual void PrepareRender(const CameraView& cameraView) override;
-		virtual void Terminate() override;
+		virtual void Draw(const CameraView& cameraView) override;
 		virtual IVoxelMesh* CreateVoxelMesh() override;
 
 	private:
-		void DoRender();
-		void Render(IVoxelMesh* voxel);
-
 		static void PrintShaderCompileStatus(GLuint shader);
 		static void PrintProgramLinkStatus(GLuint program);
 	};
