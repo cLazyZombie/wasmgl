@@ -5,6 +5,17 @@
 #include <functional>
 #include <string>
 #include <cwchar>
+#include <math.h>
+#include <memory>
+#include <limits>
+#include <chrono>
+
+#include <thread>
+#include <mutex>
+#include <shared_mutex>
+#include <atomic>
+#include <condition_variable>
+#include <algorithm>
 
 #include <emscripten.h>
 

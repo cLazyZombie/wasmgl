@@ -1,5 +1,5 @@
 #pragma once
-#include "voxelVertex.h"
+#include "VoxelVertex.h"
 
 namespace VoxerEngine
 {

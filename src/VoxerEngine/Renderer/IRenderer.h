@@ -1,9 +1,9 @@
 #pragma once
 
 #include "IVoxelMesh.h"
-#include "ICamera.h"
+#include "Math/CameraView.h"
 
-namespace voxerEngine 
+namespace VoxerEngine 
 {
     class IRenderer
     {
