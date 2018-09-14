@@ -19,11 +19,11 @@ TMPDIRS = $(sort $(foreach f, $(OBJECTS), $(dir $(f))))
 
 DEP = $(OBJECTS:.o=.d)  # one dependency file for each source
 
-$(TARGET) : $(TMPDIRS) stdafx.h.gch $(OBJECTS) 
+$(TARGET) : $(TMPDIRS) src/stdafx.h.gch $(OBJECTS) 
 	$(CC) $(CFLAGS) $(DBG_FLAGS) $(LDFLAGS) $(OBJECTS) -o $(TARGET)
 
-stdafx.h.gch : src/stdafx.h
-	$(CC) $(CFLAGS) $(DBG_FLAGS) -x c++-header src/stdafx.h -o stdafx.h.gch
+src/stdafx.h.gch : src/stdafx.h
+	$(CC) $(CFLAGS) $(DBG_FLAGS) -x c++-header src/stdafx.h -o src/stdafx.h.gch
 
 $(TMPDIRS) : 
 	mkdir -p $(TMPDIRS)
@@ -46,4 +46,4 @@ print :
 clean :
 	rm -rf $(OBJECTS)
 	rm -rf $(DEP)
-	rm -rf stdafx.h.gch
+	rm -rf src/stdafx.h.gch
