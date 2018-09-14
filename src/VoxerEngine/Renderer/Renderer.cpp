@@ -58,21 +58,6 @@ namespace VoxerEngine
         glLinkProgram(m_shaderProgram);
 		PrintProgramLinkStatus(m_shaderProgram);
 
-        glUseProgram(m_shaderProgram);
-
-        // // Specify the layout of the vertex data
-        // //GLint posAttrib = glGetAttribLocation(m_shaderProgram, "position");
-        // glEnableVertexAttribArray(0);
-        // glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(VoxelMesh), 0);
-
-        // //GLint normalAttrib = glGetAttribLocation(m_shaderProgram, "normal");
-        // glEnableVertexAttribArray(1);
-        // glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(VoxelMesh), (const GLvoid *)(3 * sizeof(GLfloat)));
-
-        // //GLint uvAttrib = glGetAttribLocation(m_shaderProgram, "uv");
-        // glEnableVertexAttribArray(2);
-        // glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(VoxelMesh), (const GLvoid *)(6 * sizeof(GLfloat)));
-
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClearDepthf(1.0f);
 		glClearStencil(0);
